@@ -1,0 +1,19 @@
+---
+title: Bellroute's devlog
+url: "https://bellroute.github.io"
+baseurl: ""
+desc: A minimal blog for off-topic blog entries.
+about: I am back-end developer
+image: https://pinto-light.glitch.me/?width=500&height=500&url=https://i.imgur.com/mxUVc2x.jpg&extension=jpg
+excerpt_separator: "<!-- more -->"
+markdown: kramdown
+gems:
+- jekyll-paginate
+exclude:
+  - .jekyll-metadata
+  - README.md
+  - CNAME
+paginate: 5
+paginate_path: "/:num/"
+highlighter: rouge
+permalink: pretty
