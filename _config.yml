@@ -4,7 +4,7 @@ url: "https://bellroute.github.io"
 baseurl: ""
 desc: A minimal blog for off-topic blog entries.
 about: I am back-end developer
-image: https://pinto-light.glitch.me/?width=500&height=500&url=https://i.imgur.com/mxUVc2x.jpg&extension=jpg
+image: https://drive.google.com/open?id=1IIwQ1Hamo9day6oHszwIkvfca6S8eorM
 excerpt_separator: "<!-- more -->"
 markdown: kramdown
 gems:
