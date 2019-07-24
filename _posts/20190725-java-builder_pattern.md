@@ -1,0 +1,199 @@
+## 빌더 패턴(Builder Pattern)
+
+점층적 생성자 패턴, 자바빈즈 패턴을 살펴보고 왜 빌더 패턴이 사용되어야 하는지 알아보았다.
+
+
+
+### 점층적 생성자 패턴
+
+> 필수 매개변수만 받는 생성자, 필수 매개변수와 선택 매개변수를 1개 받는 생성자, 선택 매개변수를 2개까지 받는 생성자… 형태로 선택 매개변수를 전부 다 받는 생성자까지 늘려가는 방식
+
+```java
+public class NutritionFacts {
+  private final int servingSize;
+  private final int servings;
+  private final int calories;
+  private final int fat;
+  private final int sodium;
+  private final int carbohydrate;
+  
+  public NutritionFacts(int servingSize, int servings) {
+    this(servingSize, servings, 0);
+  }
+  
+  public NutritionFacts(int servingSize, int servings, int calories) {
+    this(servingSize, servings, calories, 0);
+  }
+  
+  ...
+    
+  public NutritionFacts(int servingSize, int servings, int caloreis, int fat, int sodium, int carbohydrate) {
+    this.servingSize = servingSize;
+    this.servings = servings;
+    this.calories = calories;
+    this.fat = fat;
+    this sodium = sodium;
+    this.carbohydrate =  carbohydrate;
+  }
+}
+```
+
+#### 단점
+
+- 사용자가 설정하길 원치 않는 매개변수까지 값을 지정해줘야 함
+- 매개변수 개수가 많아지면 클라이언트 코드를 작성하거나 읽기 어려움 - 각 값의 의미가 무엇인지 헷갈림, 몇 개인지도 세어 봐야함, 매개변수 순서를 바꿔 건네줘도 컴파일러가 알아채지 못함
+
+
+
+### 자바빈즈 패턴
+
+> 매개변수가 없는 생성자로 객체를 만든 후, 세터(setter) 메서드를 호출해 원하는 매개변수의 값을 설정하는 방식
+
+```java
+public class NutritionFacts {
+  private final int servingSize = -1;
+  private final int servings = -1;
+  private final int calories = 0;
+  private final int fat = 0;
+  private final int sodium = 0;
+  private final int carbohydrate = 0;
+  
+  public NutritionFacts() {
+  }
+  
+  public void setSErvingSize(int val) {
+    servingSize = val;
+  }
+  
+  public void setServings(int val) {
+    servings = val;
+  }
+  public void setCalories(int val) {
+    calories = val;
+  }
+  public void setFat(int val) {
+    fat = val;
+  }
+  public void setSodium(int val) {
+    sodium = val;
+  }
+  public void setCarbohydrate(int val) {
+    carbohydrate = val;
+  }
+}
+```
+
+#### 장점
+
+- 이제 각 인자의 의미를 파악하기 쉬워졌다.
+- 복잡하게 여러 개의 생성자를 만들지 않아도 된다.
+
+
+
+#### 단점
+
+- 일관성(consistency)이 깨짐 - 객체 하나를 만들려면 메서드를 여러 개 호출해야 함
+
+- 클래스를 **불변**으로 만들 수 없음
+
+  **불변(immutable)**은 어떠한 변경도 허용하지 않는다는 뜻으로, 주로 변경을 허용하는 가변(mutable)객체와 구분하는 용도로 쓰임. 대표적으로 String 객체는 한번 만들어지면 절대 값을 바꿀 수 없는 불변 객체.
+
+- 스레드 안정성을 얻으려면 프로그래머가 추가 작업을 해줘야 함
+
+
+
+### 빌더 패턴
+
+> 점층적 생성자 패턴의 안전성과 자바빈즈 패턴의 가독성을 겸비한 패턴. 클라이언트는 필요한 객체를 직접 만드는 대신, 필수 매개변수만으로 생성자를 호출해 빌더 객체를 얻는다. 그런 다음 빌더 객체가 제공하는 일종의 세터 메서드들로 원하는 선택 매개변수들을 설정한다. 마지막으로 매개변수가 없는 build 메서드를 호출해 필요한 객체를 얻는다.
+
+```java
+public class NutritionFacts {
+    private final int servingSize;
+    private final int servings;
+    private final int calories;
+    private final int fat;
+    private final int sodium;
+    private final int carbohydrate;
+
+    public static class Builder {
+        // 필수 매개변수
+        private final int servingSize;
+        private final int servings;
+
+        // 선택 매개변수 - 기본값으로 초기화
+        private int calories      = 0;
+        private int fat           = 0;
+        private int carbohydrate  = 0;
+        private int sodium        = 0;
+
+        public Builder(int servingSize, int servings) {
+            this.servingSize = servingSize;
+            this.servings    = servings;
+        }
+
+        public Builder calories(int val) {
+            calories = val;
+            return this;
+        }
+        public Builder fat(int val) {
+            fat = val;
+            return this;
+        }
+        public Builder carbohydrate(int val) {
+            carbohydrate = val;
+            return this;
+        }
+        public Builder sodium(int val) {
+            sodium = val;
+            return this;
+        }
+        public NutritionFacts build() {
+            return new NutritionFacts(this);
+        }
+    }
+
+    private NutritionFacts(Builder builder) {
+        servingSize  = builder.servingSize;
+        servings     = builder.servings;
+        calories     = builder.calories;
+        fat          = builder.fat;
+        sodium       = builder.sodium;
+        carbohydrate = builder.carbohydrate;
+    }
+}
+```
+
+클라이언트는 위와 같은 빌더 패턴 클래스를 다음과 같이 사용할 수 있게 된다.
+
+```java
+NutritionFacts cocaCola = new NutritionFacts.Builder(240, 0)
+  .calories(100)
+  .sodium(35)
+  .carbohydrate(27)
+  .build();
+```
+
+#### 장점
+
+- 각 인자가 어떤 의미인지 알기 쉽다.
+- setter 메소드가 없으므로 변경 불가능 객체를 만들 수 있다.
+- 한 번에 객체를 생성하므로 객체 일관성이 깨지지 않는다.
+- build() 함수가 잘못된 값이 입력되었는지 검증하게 할 수도 있다.
+- 메소드 연쇄(method chaining)이 가능함 - 빌더의 세터 메소드들은 자신을 반환하기 때문
+
+
+
+#### \+) Lombok의 @Builder
+
+- @Builder 애노테이션을 사용하면 위 코드와 같은 빌더 패턴의 클래스를 사용할 수 있음
+
+
+
+
+
+
+
+#### [참고 자료]
+
+- Effective Java 3/E - 아이템 2. 생성자에 매개변수가 많다면 빌더 패터을 고려하라
+- https://johngrib.github.io/wiki/builder-pattern/
